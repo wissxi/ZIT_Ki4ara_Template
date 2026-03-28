@@ -24,6 +24,8 @@ TEXT_ENCODER_MODELS=(
 
 LORA_MODELS=(
     "https://huggingface.co/wissxi/loras/resolve/main/maya07_lora_ZImage_50steps.safetensors"
+    "https://huggingface.co/wissxi/loras/resolve/main/RealisticSnapshot-Zimage-Turbov5.safetensors"
+    "https://huggingface.co/wissxi/loras/resolve/main/b3tternud3s_v3.safetensors"
 )
 
 # ─── Функции ──────────────────────────────────────────────────────────────────
