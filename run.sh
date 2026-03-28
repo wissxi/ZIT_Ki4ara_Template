@@ -19,7 +19,7 @@ DIFFUSION_MODELS=(
 )
 
 TEXT_ENCODER_MODELS=(
-    "https://huggingface.co/Lockout/qwen3-4b-heretic-zimage/resolve/main/qwen-4b-zimage-hereticV2-q8.gguf"
+    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-hereticV2-q8.gguf"
 )
 
 LORA_MODELS=(
@@ -78,6 +78,13 @@ function provisioning_install_custom_nodes() {
     unzip -o custom_nodes.zip -d "${COMFYUI_DIR}"
     rm -f custom_nodes.zip
     echo "Custom nodes installed."
+
+    echo "=== Downloading upload_to_gofile node ==="
+    wget -q --show-progress \
+        ${HF_TOKEN:+--header="Authorization: Bearer $HF_TOKEN"} \
+        "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/upload_to_gofile.py" \
+        -O "${COMFYUI_DIR}/custom_nodes/upload_to_gofile.py"
+    echo "upload_to_gofile node installed."
 }
 
 function provisioning_install_pip_requirements() {
