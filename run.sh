@@ -11,10 +11,15 @@ echo "=== Start provisioning ==="
 
 VAE_MODELS=(
     "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/UltraFlux-v1.safetensors"
+    "https://huggingface.co/ReubenF10/ComfyUI-Models/resolve/main/vae/ae.safetensors"
+)
+
+DIFFUSION_MODELS=(
+    "https://huggingface.co/ReubenF10/ComfyUI-Models/resolve/main/diffusion_models/z_image_turbo_bf16.safetensors"
 )
 
 TEXT_ENCODER_MODELS=(
-    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-heretic-q8.gguf"
+    "https://huggingface.co/Lockout/qwen3-4b-heretic-zimage/resolve/main/qwen-4b-zimage-hereticV2-q8.gguf"
 )
 
 LORA_MODELS=(
@@ -93,9 +98,10 @@ function provisioning_start() {
     provisioning_install_custom_nodes
     provisioning_install_pip_requirements
 
-    provisioning_get_files "${COMFYUI_DIR}/models/vae"           "${VAE_MODELS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/text_encoders" "${TEXT_ENCODER_MODELS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/loras"         "${LORA_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/vae"               "${VAE_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"  "${DIFFUSION_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"     "${TEXT_ENCODER_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/loras"             "${LORA_MODELS[@]}"
 
     echo "=== Provisioning complete ==="
 }
