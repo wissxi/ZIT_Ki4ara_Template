@@ -1,95 +1,108 @@
 #!/bin/bash
 set -e
+source /venv/main/bin/activate
 
 WORKSPACE=${WORKSPACE:-/workspace}
 COMFYUI_DIR="${WORKSPACE}/ComfyUI"
-NODES_DIR="${COMFYUI_DIR}/custom_nodes"
-MODELS_DIR="${COMFYUI_DIR}/models"
 
-echo "======================================"
-echo "  ComfyUI ZIT/Ki4ra Pod — Provisioning"
-echo "======================================"
+echo "=== Start provisioning ==="
 
-# ─── Флаг: пропустить provisioning если уже запускались ───────────────────────
-if [[ -f "${WORKSPACE}/.provisioned" ]]; then
-    echo "✅ Already provisioned — skipping downloads."
-    echo "🚀 Starting ComfyUI..."
-    cd "${COMFYUI_DIR}"
-    python main.py --listen 0.0.0.0 --port 18188 --preview-method auto
-    exit 0
-fi
+# ─── Модели ───────────────────────────────────────────────────────────────────
 
-# ─── 1. ComfyUI ───────────────────────────────────────────────────────────────
-echo ""
-echo ">>> [1/5] Installing ComfyUI..."
-if [[ ! -d "${COMFYUI_DIR}" ]]; then
-    git clone https://github.com/comfyanonymous/ComfyUI "${COMFYUI_DIR}"
-fi
-cd "${COMFYUI_DIR}"
-pip install --no-cache-dir -r requirements.txt
+VAE_MODELS=(
+    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/UltraFlux-v1.safetensors"
+)
 
-# ─── 2. Python зависимости ────────────────────────────────────────────────────
-echo ""
-echo ">>> [2/5] Installing Python dependencies..."
-pip install --no-cache-dir -r "${WORKSPACE}/requirements.txt"
+TEXT_ENCODER_MODELS=(
+    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-heretic-q8.gguf"
+)
 
-# ─── 3. Custom Nodes ──────────────────────────────────────────────────────────
-echo ""
-echo ">>> [3/5] Installing custom nodes..."
-mkdir -p "${NODES_DIR}"
+LORA_MODELS=(
+    "https://huggingface.co/wissxi/loras/resolve/main/maya07_lora_ZImage_50steps.safetensors"
+)
 
-echo "  → Downloading custom_nodes.zip..."
-wget -q --show-progress \
-    ${HF_TOKEN:+--header="Authorization: Bearer ${HF_TOKEN}"} \
-    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/custom_nodes.zip" \
-    -O /tmp/custom_nodes.zip
-echo "  → Extracting custom_nodes.zip..."
-unzip -q -o /tmp/custom_nodes.zip -d "${NODES_DIR}"
-rm /tmp/custom_nodes.zip
-echo "  ✓ Custom nodes extracted"
+# ─── Функции ──────────────────────────────────────────────────────────────────
 
-# ─── 4. Модели ────────────────────────────────────────────────────────────────
-echo ""
-echo ">>> [4/5] Downloading models..."
-
-download() {
+function provisioning_get_files() {
+    if [[ $# -lt 2 ]]; then return; fi
     local dir="$1"
-    local url="$2"
-    local filename
-    filename=$(basename "$url" | cut -d'?' -f1)
+    shift
+    local files=("$@")
+
     mkdir -p "$dir"
-    if [[ ! -f "${dir}/${filename}" ]]; then
-        echo "  → Downloading ${filename}..."
-        wget -q --show-progress \
-            ${HF_TOKEN:+--header="Authorization: Bearer ${HF_TOKEN}"} \
-            --content-disposition \
-            -P "$dir" "$url" || echo "  [!] Failed: $url"
-    else
-        echo "  ✓ ${filename} already exists"
+    echo "Downloading ${#files[@]} file(s) → $dir..."
+
+    for url in "${files[@]}"; do
+        echo "→ $url"
+        local auth_header=""
+        if [[ -n "$HF_TOKEN" && "$url" =~ huggingface\.co ]]; then
+            auth_header="--header=Authorization: Bearer $HF_TOKEN"
+        fi
+        wget $auth_header -nc --content-disposition --show-progress -e dotbytes=4M -P "$dir" "$url" \
+            || echo " [!] Download failed: $url"
+    done
+}
+
+function provisioning_clone_comfyui() {
+    if [[ ! -d "${COMFYUI_DIR}" ]]; then
+        echo "Cloning ComfyUI..."
+        git clone https://github.com/comfyanonymous/ComfyUI.git "${COMFYUI_DIR}"
+    fi
+    cd "${COMFYUI_DIR}"
+}
+
+function provisioning_install_base_reqs() {
+    if [[ -f requirements.txt ]]; then
+        pip install --no-cache-dir -r requirements.txt
     fi
 }
 
-# VAE
-download "${MODELS_DIR}/vae" \
-    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/UltraFlux-v1.safetensors"
+function provisioning_install_custom_nodes() {
+    echo "=== Installing custom nodes from archive ==="
+    cd "${WORKSPACE}"
 
-# Text Encoder (GGUF)
-download "${MODELS_DIR}/text_encoders" \
-    "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-heretic-q8.gguf"
+    wget -q --show-progress \
+        ${HF_TOKEN:+--header="Authorization: Bearer $HF_TOKEN"} \
+        "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/custom_nodes.zip" \
+        -O custom_nodes.zip
 
-# LoRA
-download "${MODELS_DIR}/loras" \
-    "https://huggingface.co/wissxi/loras/resolve/main/maya07_lora_ZImage_50steps.safetensors"
+    unzip -o custom_nodes.zip -d /
+    rm -f custom_nodes.zip
+    echo "Custom nodes installed."
+}
 
-# ─── 5. Финал ─────────────────────────────────────────────────────────────────
-echo ""
-echo ">>> [5/5] Finalizing..."
-touch "${WORKSPACE}/.provisioned"
-echo "✅ Provisioning complete!"
+function provisioning_install_pip_requirements() {
+    echo "=== Installing pip requirements ==="
+    cd "${WORKSPACE}"
 
-echo ""
-echo "======================================"
-echo "  🚀 Starting ComfyUI on port 18188"
-echo "======================================"
+    wget -q \
+        ${HF_TOKEN:+--header="Authorization: Bearer $HF_TOKEN"} \
+        "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/requirements.txt" \
+        -O requirements_custom.txt
+
+    pip install --no-cache-dir -r requirements_custom.txt
+    rm -f requirements_custom.txt
+    echo "Pip requirements installed."
+}
+
+function provisioning_start() {
+    provisioning_clone_comfyui
+    provisioning_install_base_reqs
+    provisioning_install_custom_nodes
+    provisioning_install_pip_requirements
+
+    provisioning_get_files "${COMFYUI_DIR}/models/vae"           "${VAE_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/text_encoders" "${TEXT_ENCODER_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/loras"         "${LORA_MODELS[@]}"
+
+    echo "=== Provisioning complete ==="
+}
+
+# ─── Запуск ───────────────────────────────────────────────────────────────────
+
+if [[ ! -f /.noprovisioning ]]; then
+    provisioning_start
+fi
+
+echo "Script done!"
 cd "${COMFYUI_DIR}"
-python main.py --listen 0.0.0.0 --port 18188 --preview-method auto
