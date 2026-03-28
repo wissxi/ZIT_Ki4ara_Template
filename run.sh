@@ -37,6 +37,8 @@ function provisioning_get_files() {
         local auth_header=""
         if [[ -n "$HF_TOKEN" && "$url" =~ huggingface\.co ]]; then
             auth_header="--header=Authorization: Bearer $HF_TOKEN"
+        elif [[ -n "$CIVITAI_TOKEN" && "$url" =~ civitai\.com ]]; then
+            auth_header="--header=Authorization: Bearer $CIVITAI_TOKEN"
         fi
         wget $auth_header -nc --content-disposition --show-progress -e dotbytes=4M -P "$dir" "$url" \
             || echo " [!] Download failed: $url"
@@ -66,7 +68,7 @@ function provisioning_install_custom_nodes() {
         "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/custom_nodes.zip" \
         -O custom_nodes.zip
 
-    unzip -o custom_nodes.zip -d /
+    unzip -o custom_nodes.zip -d "${COMFYUI_DIR}"
     rm -f custom_nodes.zip
     echo "Custom nodes installed."
 }
