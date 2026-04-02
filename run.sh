@@ -21,7 +21,7 @@ TEXT_ENCODER_MODELS=(
     "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors"
 )
 
-CONTROLNET_MODELS=(
+MODEL_PATCHES=(
     "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union-2.1.safetensors"
 )
 
@@ -111,7 +111,7 @@ function provisioning_start() {
     provisioning_get_files "${COMFYUI_DIR}/models/vae"               "${VAE_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"  "${DIFFUSION_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"     "${TEXT_ENCODER_MODELS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/controlnet"        "${CONTROLNET_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/model_patches"     "${MODEL_PATCHES[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/loras"             "${LORA_MODELS[@]}"
 
     echo "=== Provisioning complete ==="
