@@ -7,8 +7,6 @@ COMFYUI_DIR="${WORKSPACE}/ComfyUI"
 
 echo "=== Start provisioning ==="
 
-# ─── Модели ───────────────────────────────────────────────────────────────────
-
 VAE_MODELS=(
     "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/UltraFlux-v1.safetensors"
     "https://huggingface.co/ReubenF10/ComfyUI-Models/resolve/main/vae/ae.safetensors"
@@ -20,6 +18,11 @@ DIFFUSION_MODELS=(
 
 TEXT_ENCODER_MODELS=(
     "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-hereticV2-q8.gguf"
+    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors"
+)
+
+CONTROLNET_MODELS=(
+    "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union-2.1.safetensors"
 )
 
 LORA_MODELS=(
@@ -27,8 +30,6 @@ LORA_MODELS=(
     "https://huggingface.co/wissxi/loras/resolve/main/RealisticSnapshot-Zimage-Turbov5.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/b3tternud3s_v3.safetensors"
 )
-
-# ─── Функции ──────────────────────────────────────────────────────────────────
 
 function provisioning_get_files() {
     if [[ $# -lt 2 ]]; then return; fi
@@ -110,12 +111,11 @@ function provisioning_start() {
     provisioning_get_files "${COMFYUI_DIR}/models/vae"               "${VAE_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"  "${DIFFUSION_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"     "${TEXT_ENCODER_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/controlnet"        "${CONTROLNET_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/loras"             "${LORA_MODELS[@]}"
 
     echo "=== Provisioning complete ==="
 }
-
-# ─── Запуск ───────────────────────────────────────────────────────────────────
 
 if [[ ! -f /.noprovisioning ]]; then
     provisioning_start
