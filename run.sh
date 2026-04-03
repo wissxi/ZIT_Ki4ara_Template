@@ -23,13 +23,12 @@ TEXT_ENCODER_MODELS=(
 )
 
 LORA_MODELS=(
-    "https://huggingface.co/wissxi/loras/resolve/main/maya-ZIT40.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/maya-ZIT50.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/maya-ZIT60.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/RealisticSnapshot-Zimage-Turbov5.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/b3tternud3s_v3.safetensors"
-    "https://huggingface.co/wissxi/loras/resolve/main/TurboPu%24%24yZ_v2.safetensors"
-    "https://huggingface.co/wissxi/loras/resolve/main/HI8%202000s.safetensors"
+    "https://huggingface.co/wissxi/loras/resolve/main/TurboPuppy_v2.safetensors"
+    "https://huggingface.co/wissxi/loras/resolve/main/HI8_2000s.safetensors"
 )
 
 # ─── Функции ──────────────────────────────────────────────────────────────────
