@@ -20,6 +20,8 @@ DIFFUSION_MODELS=(
 
 TEXT_ENCODER_MODELS=(
     "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/qwen-4b-zimage-hereticV2-q8.gguf"
+    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors"
+    "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
 )
 
 LORA_MODELS=(
@@ -29,6 +31,10 @@ LORA_MODELS=(
     "https://huggingface.co/wissxi/loras/resolve/main/b3tternud3s_v3.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/TurboPuppy_v2.safetensors"
     "https://huggingface.co/wissxi/loras/resolve/main/HI8_2000s.safetensors"
+)
+
+CONTROLNET_MODELS=(
+    "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union.safetensors"
 )
 
 # ─── Функции ──────────────────────────────────────────────────────────────────
@@ -114,6 +120,7 @@ function provisioning_start() {
     provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"  "${DIFFUSION_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"     "${TEXT_ENCODER_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/loras"             "${LORA_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/model_patch"       "${CONTROLNET_MODELS[@]}"
 
     echo "=== Provisioning complete ==="
 }
