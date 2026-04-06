@@ -12,6 +12,7 @@ echo "=== Start provisioning ==="
 VAE_MODELS=(
     "https://huggingface.co/wissxi/ZIT_Ki4ra/resolve/main/UltraFlux-v1.safetensors"
     "https://huggingface.co/ReubenF10/ComfyUI-Models/resolve/main/vae/ae.safetensors"
+    "https://huggingface.co/StableDiffusionVN/Flux/resolve/main/Vae/flux_vae.safetensors"
 )
 
 DIFFUSION_MODELS=(
@@ -120,7 +121,7 @@ function provisioning_start() {
     provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"  "${DIFFUSION_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"     "${TEXT_ENCODER_MODELS[@]}"
     provisioning_get_files "${COMFYUI_DIR}/models/loras"             "${LORA_MODELS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/model_patch"       "${CONTROLNET_MODELS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/model_patches"     "${CONTROLNET_MODELS[@]}"
 
     echo "=== Provisioning complete ==="
 }
